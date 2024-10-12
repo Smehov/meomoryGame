@@ -1,0 +1,67 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+}
+
+#score {
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#startGame {
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.3s;
+}
+
+#startGame:hover {
+    background-color: #45a049;
+}
+
+#gameBoard {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    width: 220px;
+    margin: 20px auto;
+}
+
+.colorButton {
+    width: 100px;
+    height: 100px;
+    margin: 5px;
+    opacity: 0.5; /* Начальная прозрачность */
+    transition: opacity 0.2s, transform 0.2s;
+    border-radius: 10px; /* Закругленные углы */
+}
+
+.colorButton:hover {
+    cursor: pointer;
+    transform: scale(1.05); /* Увеличение при наведении */
+}
+
+.green {
+    background-color: green;
+}
+
+.red {
+    background-color: red;
+}
+
+.yellow {
+    background-color: yellow;
+}
+
+.blue {
+    background-color: blue;
+}
