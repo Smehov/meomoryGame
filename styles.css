@@ -1,9 +1,10 @@
 body {
-    display: flex;
+    margin: 0;
+
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
+    height: 55vh;
     background-color: #f0f0f0;
     font-family: Arial, sans-serif;
 }
@@ -29,7 +30,7 @@ body {
     background-color: #45a049;
 }
 
-#gameBoard {
+#gameBoard { 
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     width: 220px;
@@ -64,4 +65,51 @@ body {
 
 .blue {
     background-color: blue;
+}
+
+
+
+#codexpl th, #codexpl td{
+    border-radius: 5px;
+    padding:0.8em;
+    border: 1px solid;
+}
+#codexpl th{
+    background-color:#6699FF;
+    font-weight:bold;
+}
+
+header {
+    background-color: #333;
+    padding: 10px 0;
+}
+
+nav ul {
+    
+    list-style: none;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    text-decoration: underline;
+}
+
+div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 }

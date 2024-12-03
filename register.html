@@ -7,12 +7,28 @@
     <title>Регистрация</title>
 </head>
 <body>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="info.html">Информация</a></li>
+                <li><a href="login.html">Вход</a></li>
+                <li><a href="register.html">Регистрация</a></li>
+                <li><a href="score.html">Рейтинг</a></li>
+            </ul>
+        </nav>
+    </header>
+<div class="maindiv">
     <h1>Регистрация</h1>
     <form id="registerForm">
-        <input type="text" id="newUsername" placeholder="Имя пользователя" required>
+        <input type="text" id="username" placeholder="Имя пользователя" required>
+        <input type="password" id="password" placeholder="Пароль пользователя" required/>
         <button type="submit">Зарегистрироваться</button>
     </form>
+
     <p>Уже есть аккаунт? <a href="login.html">Войти</a></p>
-    <script src="script.js"></script>
+</div>
+    <script src="script.js" defer></script>
 </body>
 </html>

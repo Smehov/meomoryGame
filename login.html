@@ -7,28 +7,28 @@
     <title>Логин</title>
 </head>
 <body>
+
+    <header>
+        <nav>
+            <ul>
+                <li><a href="index.html">Главная</a></li>
+                <li><a href="info.html">Информация</a></li>
+                <li><a href="login.html">Вход</a></li>
+                <li><a href="register.html">Регистрация</a></li>
+                <li><a href="score.html">Рейтинг</a></li>
+            </ul>
+        </nav>
+    </header>
+    <div class="maindiv">
     <h1>Логин</h1>
     <form id="loginForm">
         <input type="text" id="username" placeholder="Имя пользователя" required>
+        <input type="password"  id="password" placeholder="Пароль пользователя" required/>
         <button type="submit">Войти</button>
     </form>
     <p>Нет аккаунта? <a href="register.html">Зарегистрироваться</a></p>
-    <script src="script.js"></script>
+    </div>
 
-
-<div>
-    <h2>Счета игроков</h2>
-    <table id="scoreTable">
-        <thead>
-            <tr>
-                <th>Игрок</th>
-                <th>Счет</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Счета будут добавлены сюда -->
-        </tbody>
-    </table>
-</div>
+    <script src="script.js" defer></script> 
 </body>
 </html>
