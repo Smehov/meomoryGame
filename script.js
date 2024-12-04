@@ -1,15 +1,16 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const url = "https://d5dsv84kj5buag61adme.apigw.yandexcloud.net";
-    const users = JSON.parse(localStorage.getItem('users')) || {};
-    const score = JSON.parse(localStorage.getItem('score')) || {};
-    const colors = ['red', 'green', 'blue', 'yellow'];
-    const sounds = {
-        red: new Audio('sounds/1.mp3'),
-        green: new Audio('sounds/2.mp3'),
-        blue: new Audio('sounds/3.mp3'),
-        yellow: new Audio('sounds/4.mp3'),
-    };
+const url = "https://d5dsv84kj5buag61adme.apigw.yandexcloud.net";
+const users = JSON.parse(localStorage.getItem('users')) || {};
+const score = JSON.parse(localStorage.getItem('score')) || {};
+const colors = ['red', 'green', 'blue', 'yellow'];
+const sounds = {
+    red: new Audio('sounds/1.mp3'),
+    green: new Audio('sounds/2.mp3'),
+    blue: new Audio('sounds/3.mp3'),
+    yellow: new Audio('sounds/4.mp3'),
+};
 
+
+document.addEventListener('DOMContentLoaded', () => {
     async function hashPassword(password) {
         const encoder = new TextEncoder();
         const data = encoder.encode(password);
@@ -205,61 +206,83 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Проверяем, если текущая страница - это 'score.html'
+document.addEventListener('DOMContentLoaded', function () {
     if (window.location.pathname.includes('score.html')) {
-      // Вызываем функцию для загрузки данных с сервера, когда страница score.html загружена
       fetchPlayers();
     }
   });
   
+  let players = [];
+  let currentPage = 1;
+  const playersPerPage = 5; 
+  
   function fetchPlayers() {
     fetch(`${url}/players`)
       .then(response => response.json())
-      .then(data => buildTableCallback(JSON.stringify(data)))
+      .then(data => {
+        players = data;
+        buildTable();
+      })
       .catch(error => console.error('Ошибка при получении данных:', error));
   }
   
-  function buildTableCallback(text) {
-    let players = JSON.parse(text);
+  function buildTable() {
     let table = document.getElementById('codexpl').getElementsByTagName('tbody')[0];
-  
     table.innerHTML = '';
   
-    players.forEach(player => {
+    players.sort((a, b) => b.Score - a.Score); // Сортировка по убыванию счета
+    
+    // Выделяем самого высокого и самого низкого
+    const highestScore = players[0]?.Score;
+    const lowestScore = players[players.length - 1]?.Score;
+  
+    const startIndex = (currentPage - 1) * playersPerPage;
+    const endIndex = startIndex + playersPerPage;
+    const playersToDisplay = players.slice(startIndex, endIndex);
+  
+    playersToDisplay.forEach(player => {
       let row = table.insertRow();
       let cellName = row.insertCell();
       let cellScore = row.insertCell();
+  
       cellName.innerHTML = player.Login;
       cellScore.innerHTML = player.Score;
-    });
-  }
-
-function sorttable(tbl, colnum) {
-  var numofcols = tbl.getElementsByTagName('th').length;
-  var numofrows = tbl.getElementsByTagName('tr').length;
-  var sorted = [];
   
-  if (numofcols <= colnum) {
-      throw "Invalid Column number";
-  } else {
-      for (var i = 1; i < numofrows; i++) {
-          var trel = tbl.getElementsByTagName('tr')[i];
-          var tdel = trel.getElementsByTagName('td')[colnum];
-          for (var j = (i + 1); j < numofrows; j++) {
-              var trel2 = tbl.getElementsByTagName('tr')[j];
-              var tdel2 = trel2.getElementsByTagName('td')[colnum];
-              if (compare(tdel.innerHTML, tdel2.innerHTML) < 0) {
-                  sorted[j - 1] = (sorted[j - 1] || 0) + 1;
-              } else if (compare(tdel.innerHTML, tdel2.innerHTML) > 0) {
-                  sorted[i - 1] = (sorted[i - 1] || 0) + 1;
-              } else {
-                  sorted[i - 1] = (sorted[i - 1] || 0) + 1;
-              }
-          }
-      }
-  }
-  movedarows(tbl, sorted);
-}
 
+      if (player.Score === highestScore) {
+        row.style.backgroundColor = 'green';
+      } else if (player.Score === lowestScore) {
+        row.style.backgroundColor = 'red';
+      }
+    });
+  
+    // Обновляем пагинацию
+    updatePagination();
+  }
+  
+  function sortTable(columnIndex) {
+    if (columnIndex === 1) {
+      players.sort((a, b) => b.Score - a.Score); 
+    } else {
+      players.sort((a, b) => a.Login.localeCompare(b.Login)); 
+    }
+    buildTable();
+  }
+  
+  function changePage(direction) {
+    currentPage += direction;
+    if (currentPage < 1) currentPage = 1;
+    if (currentPage > Math.ceil(players.length / playersPerPage)) {
+      currentPage = Math.ceil(players.length / playersPerPage);
+    }
+    buildTable();
+  }
+  
+  function updatePagination() {
+    const totalPages = Math.ceil(players.length / playersPerPage);
+    document.getElementById('pageNumber').innerText = `Page ${currentPage} of ${totalPages}`;
+  
+    document.getElementById('prevPage').disabled = currentPage === 1;
+    document.getElementById('nextPage').disabled = currentPage === totalPages;
+  }
 
