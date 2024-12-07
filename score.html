@@ -11,35 +11,51 @@
 
   <header>
     <nav>
-        <ul>
-            <li><a href="index.html">Главная</a></li>
-            <li><a href="info.html">Информация</a></li>
-            <li><a href="login.html">Вход</a></li>
-            <li><a href="register.html">Регистрация</a></li>
-            <li><a href="score.html">Рейтинг</a></li>
-        </ul>
+      <ul>
+        <li><a href="index.html">Главная</a></li>
+        <li><a href="info.html">Информация</a></li>
+        <li><a href="login.html">Вход</a></li>
+        <li><a href="register.html">Регистрация</a></li>
+        <li><a href="score.html">Рейтинг</a></li>
+      </ul>
     </nav>
-</header>
-<div class="maindiv">
-  <h1 id="score">Счет: 0</h1>
-  
-  <table id="codexpl">
-    <thead>
-      <tr>
-        <th onclick="sortTable(0)">Name</th>
-        <th onclick="sortTable(1)">Score</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  
-  <!-- Пагинация -->
-  <div id="pagination">
-    <button id="prevPage" onclick="changePage(-1)">Prev</button>
-    <span id="pageNumber">Page 1</span>
-    <button id="nextPage" onclick="changePage(1)">Next</button>
+  </header>
+
+  <div class="maindiv">
+    <h1 id="score">Счет: 0</h1>
+
+    <!-- Контейнер с кнопками сортировки -->
+    <div class="sort-buttons">
+      <button id="sortByMinScore">Сортировать по минимальному счету</button>
+      <button id="sortByMaxScore">Сортировать по максимальному счету</button>
+      <button id="sortByNameAsc">Сортировать по имени (А-Я)</button>
+      <button id="sortByNameDesc">Сортировать по имени (Я-А)</button>
+    </div>
+
+    <!-- Поле поиска по имени -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Поиск по имени" oninput="filterPlayers()">
+    </div>
+
+    <!-- Таблица с данными -->
+    <table id="codexpl">
+      <thead>
+        <tr>
+          <th onclick="sortTable(0)">Name</th>
+          <th onclick="sortTable(1)">Score</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <!-- Пагинация -->
+    <div id="pagination">
+      <button id="prevPage" onclick="changePage(-1)">Prev</button>
+      <span id="pageNumber">Page 1</span>
+      <button id="nextPage" onclick="changePage(1)">Next</button>
+    </div>
   </div>
-</div>
+
   <script src="script.js"></script>
 </body>
 </html>

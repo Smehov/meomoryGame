@@ -1,6 +1,6 @@
 const url = "https://d5dsv84kj5buag61adme.apigw.yandexcloud.net";
 const users = JSON.parse(localStorage.getItem('users')) || {};
-const score = JSON.parse(localStorage.getItem('score')) || {};
+let score = JSON.parse(localStorage.getItem('score')) || {};
 const colors = ['red', 'green', 'blue', 'yellow'];
 const sounds = {
     red: new Audio('sounds/1.mp3'),
@@ -8,7 +8,9 @@ const sounds = {
     blue: new Audio('sounds/3.mp3'),
     yellow: new Audio('sounds/4.mp3'),
 };
-
+let players = [];
+let currentPage = 1;
+const playersPerPage = 5;
 
 document.addEventListener('DOMContentLoaded', () => {
     async function hashPassword(password) {
@@ -90,8 +92,48 @@ document.addEventListener('DOMContentLoaded', () => {
         let sequence = [];
         let userSequence = [];
         let scoreCounter = 0;
+
+        const pushLastMaxScore= async (currentScore) => {
+
+            if (!currentUser) {
+                console.error('Пользователь не авторизован');
+                return;
+            }
+
+                let maxScore = localStorage.getItem('maxScore') || 0
+
+                if(currentScore > maxScore){
+                    maxScore = currentScore
+                }
+                try {
+                    score = maxScore
+                const response = await fetch(`${url}/players/${currentUser}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({  score }),
+                    credentials: 'include',
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Ошибка при обновлении счета');
+                }
+
+                const result = await response.json();
+                console.log(result); 
+                return;
+
+            } catch (error) {
+                console.error('Ошибка:', error.message || 'Неизвестная ошибка');
+            }
+        }
     
         const startGame = () => {
+            if (! document.getElementById('score')){
+                score = 0;
+            }
+            pushLastMaxScore(score)
             scoreCounter = 0;
             sequence = [];
             document.getElementById('score').innerText = 'Счет: 0'; // Сбросить счет на экране
@@ -204,41 +246,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
-
 document.addEventListener('DOMContentLoaded', function () {
     if (window.location.pathname.includes('score.html')) {
       fetchPlayers();
     }
+  
+    document.getElementById('sortByMinScore').addEventListener('click', () => sortTable('minScore'));
+    document.getElementById('sortByMaxScore').addEventListener('click', () => sortTable('maxScore'));
+    document.getElementById('sortByNameAsc').addEventListener('click', () => sortTable('nameAsc'));
+    document.getElementById('sortByNameDesc').addEventListener('click', () => sortTable('nameDesc'));
   });
   
-  let players = [];
-  let currentPage = 1;
-  const playersPerPage = 5; 
-  
+
   function fetchPlayers() {
     fetch(`${url}/players`)
       .then(response => response.json())
       .then(data => {
         players = data;
-        buildTable();
+        filteredPlayers = players; 
+        buildTable(); 
       })
       .catch(error => console.error('Ошибка при получении данных:', error));
   }
   
+  function filterPlayers() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    
+    // Фильтруем игроков по имени (сравниваем с введенным текстом)
+    filteredPlayers = players.filter(player => 
+      player.Login.toLowerCase().includes(searchTerm)
+    );
+  
+    buildTable();
+  }
+  
+  // Функция для построения таблицы
   function buildTable() {
     let table = document.getElementById('codexpl').getElementsByTagName('tbody')[0];
     table.innerHTML = '';
   
-    players.sort((a, b) => b.Score - a.Score); // Сортировка по убыванию счета
-    
-    // Выделяем самого высокого и самого низкого
-    const highestScore = players[0]?.Score;
-    const lowestScore = players[players.length - 1]?.Score;
+    // Выделение самого высокого и самого низкого
+    const highestScore = filteredPlayers[0]?.Score;
+    const lowestScore = filteredPlayers[filteredPlayers.length - 1]?.Score;
   
     const startIndex = (currentPage - 1) * playersPerPage;
     const endIndex = startIndex + playersPerPage;
-    const playersToDisplay = players.slice(startIndex, endIndex);
+    const playersToDisplay = filteredPlayers.slice(startIndex, endIndex);
   
     playersToDisplay.forEach(player => {
       let row = table.insertRow();
@@ -248,41 +301,50 @@ document.addEventListener('DOMContentLoaded', function () {
       cellName.innerHTML = player.Login;
       cellScore.innerHTML = player.Score;
   
-
       if (player.Score === highestScore) {
-        row.style.backgroundColor = 'green';
+        row.style.backgroundColor = 'green';  
       } else if (player.Score === lowestScore) {
-        row.style.backgroundColor = 'red';
+        row.style.backgroundColor = 'red';  
       }
     });
   
-    // Обновляем пагинацию
     updatePagination();
   }
   
-  function sortTable(columnIndex) {
-    if (columnIndex === 1) {
-      players.sort((a, b) => b.Score - a.Score); 
-    } else {
-      players.sort((a, b) => a.Login.localeCompare(b.Login)); 
+
+  function sortTable(criteria) {
+    switch (criteria) {
+      case 'minScore':
+        filteredPlayers.sort((a, b) => a.Score - b.Score);
+        break;
+      case 'maxScore':
+        filteredPlayers.sort((a, b) => b.Score - a.Score);
+        break;
+      case 'nameAsc':
+        filteredPlayers.sort((a, b) => a.Login.localeCompare(b.Login));
+        break;
+      case 'nameDesc':
+        filteredPlayers.sort((a, b) => b.Login.localeCompare(a.Login));
+        break;
     }
     buildTable();
   }
   
+  // Функция для переключения страниц
   function changePage(direction) {
     currentPage += direction;
     if (currentPage < 1) currentPage = 1;
-    if (currentPage > Math.ceil(players.length / playersPerPage)) {
-      currentPage = Math.ceil(players.length / playersPerPage);
+    if (currentPage > Math.ceil(filteredPlayers.length / playersPerPage)) {
+      currentPage = Math.ceil(filteredPlayers.length / playersPerPage);
     }
     buildTable();
   }
   
+  // Обновление пагинации
   function updatePagination() {
-    const totalPages = Math.ceil(players.length / playersPerPage);
+    const totalPages = Math.ceil(filteredPlayers.length / playersPerPage);
     document.getElementById('pageNumber').innerText = `Page ${currentPage} of ${totalPages}`;
   
     document.getElementById('prevPage').disabled = currentPage === 1;
     document.getElementById('nextPage').disabled = currentPage === totalPages;
   }
-
